@@ -400,3 +400,6 @@ FodyWeavers.xsd
 TestResult.xml
 nunit-*.xml
 >>>>>>> 1588906507a1c5cf3e694bcd531e97e9fb8efdbc
+/Universal-SMTP-Tester/Form1.Designer.cs.bak
+/Universal-SMTP-Tester/Form1.cs.bak
+*.bak
