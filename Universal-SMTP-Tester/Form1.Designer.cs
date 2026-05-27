@@ -42,6 +42,7 @@
             btnSSLDirect = new RadioButton();
             btnPlain = new RadioButton();
             chkSMTPAUTH = new CheckBox();
+            chkIgnoreSslCertificateErrors = new CheckBox();
             txtUsername = new TextBox();
             lblUsername = new Label();
             lblPassword = new Label();
@@ -194,6 +195,16 @@
             chkSMTPAUTH.UseVisualStyleBackColor = true;
             chkSMTPAUTH.CheckedChanged += chkSMTPAUTH_CheckedChanged;
             // 
+            // chkIgnoreSslCertificateErrors
+            // 
+            chkIgnoreSslCertificateErrors.AutoSize = true;
+            chkIgnoreSslCertificateErrors.Location = new Point(592, 115);
+            chkIgnoreSslCertificateErrors.Name = "chkIgnoreSslCertificateErrors";
+            chkIgnoreSslCertificateErrors.Size = new Size(179, 24);
+            chkIgnoreSslCertificateErrors.TabIndex = 11;
+            chkIgnoreSslCertificateErrors.Text = "Ignore SSL cert errors";
+            chkIgnoreSslCertificateErrors.UseVisualStyleBackColor = true;
+            // 
             // txtUsername
             // 
             txtUsername.Enabled = false;
@@ -318,6 +329,7 @@
             Controls.Add(lblPassword);
             Controls.Add(lblUsername);
             Controls.Add(txtUsername);
+            Controls.Add(chkIgnoreSslCertificateErrors);
             Controls.Add(chkSMTPAUTH);
             Controls.Add(boxProtocol);
             Controls.Add(lblPort);
@@ -353,6 +365,7 @@
         private RadioButton btnSSLDirect;
         private RadioButton btnPlain;
         private CheckBox chkSMTPAUTH;
+        private CheckBox chkIgnoreSslCertificateErrors;
         private TextBox txtUsername;
         private Label lblUsername;
         private Label lblPassword;

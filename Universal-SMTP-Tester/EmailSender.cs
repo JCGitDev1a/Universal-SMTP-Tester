@@ -1,27 +1,37 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Net.Mail;
-using System.Net;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Text;
+using MailKit.Net.Smtp;
+using MailKit.Security;
+using MimeKit;
 
 namespace Universal_SMTP_Tester
 {
+    public enum SmtpSecurityMode
+    {
+        Plain,
+        SslOnConnect,
+        StartTls
+    }
+
     public class EmailOptions
     {
-        public string SmtpHost { get; set; }
+        public string SmtpHost { get; set; } = string.Empty;
         public int SmtpPort { get; set; } = 587;
-        public bool EnableSsl { get; set; } = true;
-        public string Username { get; set; }
-        public string Password { get; set; }
+        public SmtpSecurityMode SecurityMode { get; set; } = SmtpSecurityMode.StartTls;
+        public bool IgnoreSslCertificateErrors { get; set; }
 
-        public string From { get; set; }
-        public string To { get; set; }
+        public bool UseAuthentication { get; set; }
+        public string Username { get; set; } = string.Empty;
+        public string Password { get; set; } = string.Empty;
 
-        public string Subject { get; set; }
-        public string Body { get; set; }
-        public string MimeType { get; set; } = "text/plain"; // or "text/html"
+        public string FriendlyName { get; set; } = string.Empty;
+        public string From { get; set; } = string.Empty;
+        public string To { get; set; } = string.Empty;
+        public string Cc { get; set; } = string.Empty;
+        public string Bcc { get; set; } = string.Empty;
+
+        public string Subject { get; set; } = string.Empty;
+        public string Body { get; set; } = string.Empty;
+        public string MimeType { get; set; } = "text/plain";
         public Encoding BodyEncoding { get; set; } = Encoding.UTF8;
         public Encoding SubjectEncoding { get; set; } = Encoding.UTF8;
 
@@ -32,55 +42,135 @@ namespace Universal_SMTP_Tester
     {
         public static void SendEmail(EmailOptions options)
         {
-            using (var message = BuildMailMessage(options))
-            using (var client = new SmtpClient(options.SmtpHost, options.SmtpPort))
-            {
-                client.EnableSsl = options.EnableSsl;
-                client.Credentials = new NetworkCredential(options.Username, options.Password);
-                client.Send(message);
-            }
+            SendEmailAsync(options).GetAwaiter().GetResult();
         }
 
         public static async Task SendEmailAsync(EmailOptions options)
         {
-            using (var message = BuildMailMessage(options))
-            using (var client = new SmtpClient(options.SmtpHost, options.SmtpPort))
+            ValidateOptions(options);
+
+            using var message = BuildMimeMessage(options);
+            using var client = new SmtpClient();
+
+            if (options.IgnoreSslCertificateErrors)
             {
-                client.EnableSsl = options.EnableSsl;
-                client.Credentials = new NetworkCredential(options.Username, options.Password);
-                await client.SendMailAsync(message);
+                // Testing-only option for lab/self-signed/mismatched certificate scenarios.
+                // Do not enable this for normal production SMTP testing.
+                client.ServerCertificateValidationCallback = (sender, certificate, chain, sslPolicyErrors) => true;
             }
+
+            await client.ConnectAsync(
+                options.SmtpHost,
+                options.SmtpPort,
+                GetSecureSocketOptions(options.SecurityMode));
+
+            if (options.UseAuthentication)
+            {
+                await client.AuthenticateAsync(options.Username, options.Password);
+            }
+
+            await client.SendAsync(message);
+            await client.DisconnectAsync(true);
         }
 
-        private static MailMessage BuildMailMessage(EmailOptions options)
+        private static MimeMessage BuildMimeMessage(EmailOptions options)
         {
-            if (string.IsNullOrWhiteSpace(options.From) || string.IsNullOrWhiteSpace(options.To))
-                throw new ArgumentException("Sender and recipient must be specified.");
+            var message = new MimeMessage();
 
-            var message = new MailMessage(options.From, options.To)
+            message.From.Add(BuildMailboxAddress(options.FriendlyName, options.From));
+            AddAddresses(message.To, options.To);
+            AddAddresses(message.Cc, options.Cc);
+            AddAddresses(message.Bcc, options.Bcc);
+
+            message.Subject = options.Subject ?? string.Empty;
+
+            message.Headers.Add("X-SMTP-Tester-Security-Mode", options.SecurityMode.ToString());
+            message.Headers.Add("X-SMTP-Tester-Ignore-SSL-Certificate-Errors", options.IgnoreSslCertificateErrors.ToString());
+            message.Headers.Add("X-SMTP-Tester-Body-Mime-Type", options.MimeType);
+            message.Headers.Add("X-SMTP-Tester-Body-Encoding", options.BodyEncoding.WebName);
+            message.Headers.Add("X-SMTP-Tester-Subject-Encoding", options.SubjectEncoding.WebName);
+
+            var bodyPart = new TextPart(GetTextPartSubtype(options.MimeType))
             {
-                Subject = options.Subject ?? string.Empty,
-                SubjectEncoding = options.SubjectEncoding,
-                BodyEncoding = options.BodyEncoding,
-                IsBodyHtml = options.MimeType.Equals("text/html", StringComparison.OrdinalIgnoreCase)
+                Text = options.Body ?? string.Empty
             };
 
-            var view = AlternateView.CreateAlternateViewFromString(
-                options.Body ?? string.Empty,
-                options.BodyEncoding,
-                options.MimeType
-            );
-            message.AlternateViews.Add(view);
+            var builder = new BodyBuilder();
+
+            if (options.MimeType.Equals("text/html", StringComparison.OrdinalIgnoreCase))
+            {
+                builder.HtmlBody = bodyPart.Text;
+            }
+            else
+            {
+                builder.TextBody = bodyPart.Text;
+            }
 
             foreach (var filePath in options.AttachmentPaths)
             {
-                if (File.Exists(filePath))
+                if (!string.IsNullOrWhiteSpace(filePath) && File.Exists(filePath))
                 {
-                    message.Attachments.Add(new Attachment(filePath));
+                    builder.Attachments.Add(filePath);
                 }
             }
 
+            message.Body = builder.ToMessageBody();
+
             return message;
+        }
+
+        private static void ValidateOptions(EmailOptions options)
+        {
+            if (string.IsNullOrWhiteSpace(options.SmtpHost))
+                throw new ArgumentException("SMTP host is required.");
+
+            if (options.SmtpPort <= 0 || options.SmtpPort > 65535)
+                throw new ArgumentException("SMTP port must be between 1 and 65535.");
+
+            if (string.IsNullOrWhiteSpace(options.From))
+                throw new ArgumentException("Sender address is required.");
+
+            if (string.IsNullOrWhiteSpace(options.To))
+                throw new ArgumentException("At least one recipient address is required.");
+
+            if (options.UseAuthentication && string.IsNullOrWhiteSpace(options.Username))
+                throw new ArgumentException("SMTP username is required when authentication is enabled.");
+        }
+
+        private static MailboxAddress BuildMailboxAddress(string displayName, string emailAddress)
+        {
+            return string.IsNullOrWhiteSpace(displayName)
+                ? MailboxAddress.Parse(emailAddress)
+                : new MailboxAddress(displayName, emailAddress);
+        }
+
+        private static void AddAddresses(InternetAddressList addressList, string addresses)
+        {
+            if (string.IsNullOrWhiteSpace(addresses))
+                return;
+
+            foreach (var address in addresses.Split(new[] { ',', ';' }, StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries))
+            {
+                addressList.Add(MailboxAddress.Parse(address));
+            }
+        }
+
+        private static SecureSocketOptions GetSecureSocketOptions(SmtpSecurityMode securityMode)
+        {
+            return securityMode switch
+            {
+                SmtpSecurityMode.Plain => SecureSocketOptions.None,
+                SmtpSecurityMode.SslOnConnect => SecureSocketOptions.SslOnConnect,
+                SmtpSecurityMode.StartTls => SecureSocketOptions.StartTls,
+                _ => SecureSocketOptions.Auto
+            };
+        }
+
+        private static string GetTextPartSubtype(string mimeType)
+        {
+            return mimeType.Equals("text/html", StringComparison.OrdinalIgnoreCase)
+                ? "html"
+                : "plain";
         }
     }
 }

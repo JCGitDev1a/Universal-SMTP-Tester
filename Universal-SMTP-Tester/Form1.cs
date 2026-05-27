@@ -7,69 +7,86 @@ namespace Universal_SMTP_Tester
         public Form1()
         {
             InitializeComponent();
+            txtPassword.UseSystemPasswordChar = true;
         }
 
         private async void sendEmail_Click(object sender, EventArgs e)
         {
             try
             {
-                int optEnableSSL = 0;
-                if (btnSSLDirect.Checked == true)
+                if (!int.TryParse(intSmtpPort.Text, out var smtpPort))
                 {
-                    optEnableSSL = 1;
+                    MessageBox.Show("SMTP port must be a valid number.", "Validation Error",
+                        MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    return;
                 }
-                else if (btnStartTLS.Checked == true)
-                {
-                    optEnableSSL = 2;
-                }
+
                 var options = new EmailOptions
                 {
-                    SmtpHost = txtSmtpHost.Text,
-                    SmtpPort = int.Parse(intSmtpPort.Text),
-                    //EnableSsl = chkSsl.Checked,
-                    //EnableSsl = optEnableSSL,
-                    EnableSsl = false,
-                    Username = txtUsername.Text,
+                    SmtpHost = txtSmtpHost.Text.Trim(),
+                    SmtpPort = smtpPort,
+                    SecurityMode = GetSelectedSecurityMode(),
+                    IgnoreSslCertificateErrors = chkIgnoreSslCertificateErrors.Checked,
+                    UseAuthentication = chkSMTPAUTH.Checked,
+                    Username = txtUsername.Text.Trim(),
                     Password = txtPassword.Text,
-                    From = txtFrom.Text,
-                    To = txtTo.Text,
+                    FriendlyName = txtFriendlyName.Text.Trim(),
+                    From = txtFrom.Text.Trim(),
+                    To = txtTo.Text.Trim(),
+                    Cc = txtCC.Text.Trim(),
+                    Bcc = txtBCC.Text.Trim(),
                     Subject = txtSubject.Text,
                     Body = txtBody.Text,
-                    //MimeType = rdoHtml.Checked ? "text/html" : "text/plain",
                     MimeType = "text/plain",
-                    BodyEncoding = Encoding.UTF8, // or Encoding.ASCII
+                    BodyEncoding = Encoding.UTF8,
                     SubjectEncoding = Encoding.UTF8,
-                    AttachmentPaths = new[] { @"C:\example\file.txt" } // get from OpenFileDialog
+                    AttachmentPaths = Array.Empty<string>()
                 };
 
                 await EmailSender.SendEmailAsync(options);
-                MessageBox.Show("Email sent successfully!");
+                MessageBox.Show("Email sent successfully!", "Success",
+                    MessageBoxButtons.OK, MessageBoxIcon.Information);
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"Failed to send email: {ex.Message}");
+                MessageBox.Show($"Failed to send email:{Environment.NewLine}{ex}", "Send Failed",
+                    MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
+        }
+
+        private SmtpSecurityMode GetSelectedSecurityMode()
+        {
+            if (btnSSLDirect.Checked)
+                return SmtpSecurityMode.SslOnConnect;
+
+            if (btnStartTLS.Checked)
+                return SmtpSecurityMode.StartTls;
+
+            return SmtpSecurityMode.Plain;
         }
 
         private void btnPlain_CheckedChanged(object sender, EventArgs e)
         {
-            intSmtpPort.Text = "25";
+            if (btnPlain.Checked)
+                intSmtpPort.Text = "25";
         }
 
         private void btnSSLDirect_CheckedChanged(object sender, EventArgs e)
         {
-            intSmtpPort.Text = "465";
+            if (btnSSLDirect.Checked)
+                intSmtpPort.Text = "465";
         }
 
         private void btnStartTLS_CheckedChanged(object sender, EventArgs e)
         {
-            intSmtpPort.Text = "587";
+            if (btnStartTLS.Checked)
+                intSmtpPort.Text = "587";
         }
 
         private void chkSMTPAUTH_CheckedChanged(object sender, EventArgs e)
         {
-            txtUsername.Enabled = true;
-            txtPassword.Enabled = true;
+            txtUsername.Enabled = chkSMTPAUTH.Checked;
+            txtPassword.Enabled = chkSMTPAUTH.Checked;
         }
     }
 }
