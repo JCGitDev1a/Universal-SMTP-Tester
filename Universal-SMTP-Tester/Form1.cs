@@ -4,10 +4,16 @@ namespace Universal_SMTP_Tester
 {
     public partial class Form1 : Form
     {
+        private bool _isInitializingMessageFormatOptions;
+
         public Form1()
         {
             InitializeComponent();
             txtPassword.UseSystemPasswordChar = true;
+            _isInitializingMessageFormatOptions = true;
+            InitializeMessageFormatOptions();
+            _isInitializingMessageFormatOptions = false;
+            UpdateGeneratedTestEmailCount();
         }
 
         private async void sendEmail_Click(object sender, EventArgs e)
@@ -87,6 +93,69 @@ namespace Universal_SMTP_Tester
         {
             txtUsername.Enabled = chkSMTPAUTH.Checked;
             txtPassword.Enabled = chkSMTPAUTH.Checked;
+        }
+
+
+        private void InitializeMessageFormatOptions()
+        {
+            AddCheckedListBoxItems(clbTransferEncoding, Enum.GetNames<MimeTransferEncodingOption>());
+            AddCheckedListBoxItems(clbMimeBodyEncoding, Enum.GetNames<MimeBodyTypeOption>());
+            AddCheckedListBoxItems(clbCharacterEncoding, Enum.GetNames<CharacterEncodingOption>());
+            AddCheckedListBoxItems(clbHeaderEncoding, Enum.GetNames<HeaderEncodingOption>());
+
+            CheckFirstItem(clbTransferEncoding);
+            CheckFirstItem(clbMimeBodyEncoding);
+            CheckFirstItem(clbCharacterEncoding);
+            CheckFirstItem(clbHeaderEncoding);
+        }
+
+        private static void AddCheckedListBoxItems(CheckedListBox checkedListBox, IEnumerable<string> items)
+        {
+            checkedListBox.Items.Clear();
+
+            foreach (var item in items)
+            {
+                checkedListBox.Items.Add(item);
+            }
+        }
+
+        private static void CheckFirstItem(CheckedListBox checkedListBox)
+        {
+            if (checkedListBox.Items.Count > 0)
+            {
+                checkedListBox.SetItemChecked(0, true);
+            }
+        }
+
+        private void MessageFormat_ItemCheck(object sender, ItemCheckEventArgs e)
+        {
+            if (_isInitializingMessageFormatOptions || !IsHandleCreated)
+            {
+                return;
+            }
+
+            BeginInvoke(new MethodInvoker(UpdateGeneratedTestEmailCount));
+        }
+
+        private void UpdateGeneratedTestEmailCount()
+        {
+            var transferEncodingCount = GetCheckedItemCount(clbTransferEncoding);
+            var mimeBodyEncodingCount = GetCheckedItemCount(clbMimeBodyEncoding);
+            var characterEncodingCount = GetCheckedItemCount(clbCharacterEncoding);
+            var headerEncodingCount = GetCheckedItemCount(clbHeaderEncoding);
+
+            var generatedEmailCount =
+                transferEncodingCount *
+                mimeBodyEncodingCount *
+                characterEncodingCount *
+                headerEncodingCount;
+
+            lblGeneratedTestEmails.Text = $"Generated Test Emails: {generatedEmailCount}";
+        }
+
+        private static int GetCheckedItemCount(CheckedListBox checkedListBox)
+        {
+            return Math.Max(1, checkedListBox.CheckedItems.Count);
         }
     }
 }

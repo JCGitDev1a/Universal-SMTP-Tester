@@ -56,7 +56,20 @@
             txtSubject = new TextBox();
             txtCC = new TextBox();
             txtBCC = new TextBox();
+            groupMessageFormat = new GroupBox();
+            tableMessageFormat = new TableLayoutPanel();
+            lblTransferEncoding = new Label();
+            clbTransferEncoding = new CheckedListBox();
+            lblMimeBodyEncoding = new Label();
+            clbMimeBodyEncoding = new CheckedListBox();
+            lblCharacterEncoding = new Label();
+            clbCharacterEncoding = new CheckedListBox();
+            lblHeaderEncoding = new Label();
+            clbHeaderEncoding = new CheckedListBox();
+            lblGeneratedTestEmails = new Label();
             boxProtocol.SuspendLayout();
+            groupMessageFormat.SuspendLayout();
+            tableMessageFormat.SuspendLayout();
             SuspendLayout();
             // 
             // txtSmtpHost
@@ -310,12 +323,138 @@
             txtBCC.Name = "txtBCC";
             txtBCC.Size = new Size(226, 27);
             txtBCC.TabIndex = 24;
+
+            // 
+            // groupMessageFormat
+            // 
+            groupMessageFormat.Controls.Add(tableMessageFormat);
+            groupMessageFormat.Controls.Add(lblGeneratedTestEmails);
+            groupMessageFormat.Location = new Point(620, 152);
+            groupMessageFormat.Name = "groupMessageFormat";
+            groupMessageFormat.Size = new Size(360, 309);
+            groupMessageFormat.TabIndex = 25;
+            groupMessageFormat.TabStop = false;
+            groupMessageFormat.Text = "Message Format";
+            // 
+            // tableMessageFormat
+            // 
+            tableMessageFormat.ColumnCount = 2;
+            tableMessageFormat.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 50F));
+            tableMessageFormat.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 50F));
+            tableMessageFormat.Controls.Add(lblTransferEncoding, 0, 0);
+            tableMessageFormat.Controls.Add(clbTransferEncoding, 0, 1);
+            tableMessageFormat.Controls.Add(lblMimeBodyEncoding, 1, 0);
+            tableMessageFormat.Controls.Add(clbMimeBodyEncoding, 1, 1);
+            tableMessageFormat.Controls.Add(lblCharacterEncoding, 0, 2);
+            tableMessageFormat.Controls.Add(clbCharacterEncoding, 0, 3);
+            tableMessageFormat.Controls.Add(lblHeaderEncoding, 1, 2);
+            tableMessageFormat.Controls.Add(clbHeaderEncoding, 1, 3);
+            tableMessageFormat.Location = new Point(12, 26);
+            tableMessageFormat.Name = "tableMessageFormat";
+            tableMessageFormat.RowCount = 4;
+            tableMessageFormat.RowStyles.Add(new RowStyle(SizeType.Absolute, 24F));
+            tableMessageFormat.RowStyles.Add(new RowStyle(SizeType.Absolute, 104F));
+            tableMessageFormat.RowStyles.Add(new RowStyle(SizeType.Absolute, 24F));
+            tableMessageFormat.RowStyles.Add(new RowStyle(SizeType.Absolute, 104F));
+            tableMessageFormat.Size = new Size(336, 256);
+            tableMessageFormat.TabIndex = 0;
+            // 
+            // lblTransferEncoding
+            // 
+            lblTransferEncoding.AutoSize = true;
+            lblTransferEncoding.Location = new Point(3, 0);
+            lblTransferEncoding.Name = "lblTransferEncoding";
+            lblTransferEncoding.Size = new Size(126, 20);
+            lblTransferEncoding.TabIndex = 0;
+            lblTransferEncoding.Text = "Transfer Encoding";
+            // 
+            // clbTransferEncoding
+            // 
+            clbTransferEncoding.CheckOnClick = true;
+            clbTransferEncoding.FormattingEnabled = true;
+            clbTransferEncoding.IntegralHeight = false;
+            clbTransferEncoding.Location = new Point(3, 27);
+            clbTransferEncoding.Name = "clbTransferEncoding";
+            clbTransferEncoding.Size = new Size(162, 98);
+            clbTransferEncoding.TabIndex = 1;
+            clbTransferEncoding.ItemCheck += MessageFormat_ItemCheck;
+            // 
+            // lblMimeBodyEncoding
+            // 
+            lblMimeBodyEncoding.AutoSize = true;
+            lblMimeBodyEncoding.Location = new Point(171, 0);
+            lblMimeBodyEncoding.Name = "lblMimeBodyEncoding";
+            lblMimeBodyEncoding.Size = new Size(149, 20);
+            lblMimeBodyEncoding.TabIndex = 2;
+            lblMimeBodyEncoding.Text = "MIME Body Encoding";
+            // 
+            // clbMimeBodyEncoding
+            // 
+            clbMimeBodyEncoding.CheckOnClick = true;
+            clbMimeBodyEncoding.FormattingEnabled = true;
+            clbMimeBodyEncoding.IntegralHeight = false;
+            clbMimeBodyEncoding.Location = new Point(171, 27);
+            clbMimeBodyEncoding.Name = "clbMimeBodyEncoding";
+            clbMimeBodyEncoding.Size = new Size(162, 98);
+            clbMimeBodyEncoding.TabIndex = 3;
+            clbMimeBodyEncoding.ItemCheck += MessageFormat_ItemCheck;
+            // 
+            // lblCharacterEncoding
+            // 
+            lblCharacterEncoding.AutoSize = true;
+            lblCharacterEncoding.Location = new Point(3, 128);
+            lblCharacterEncoding.Name = "lblCharacterEncoding";
+            lblCharacterEncoding.Size = new Size(141, 20);
+            lblCharacterEncoding.TabIndex = 4;
+            lblCharacterEncoding.Text = "Character Encoding";
+            // 
+            // clbCharacterEncoding
+            // 
+            clbCharacterEncoding.CheckOnClick = true;
+            clbCharacterEncoding.FormattingEnabled = true;
+            clbCharacterEncoding.IntegralHeight = false;
+            clbCharacterEncoding.Location = new Point(3, 155);
+            clbCharacterEncoding.Name = "clbCharacterEncoding";
+            clbCharacterEncoding.Size = new Size(162, 98);
+            clbCharacterEncoding.TabIndex = 5;
+            clbCharacterEncoding.ItemCheck += MessageFormat_ItemCheck;
+            // 
+            // lblHeaderEncoding
+            // 
+            lblHeaderEncoding.AutoSize = true;
+            lblHeaderEncoding.Location = new Point(171, 128);
+            lblHeaderEncoding.Name = "lblHeaderEncoding";
+            lblHeaderEncoding.Size = new Size(125, 20);
+            lblHeaderEncoding.TabIndex = 6;
+            lblHeaderEncoding.Text = "Header Encoding";
+            // 
+            // clbHeaderEncoding
+            // 
+            clbHeaderEncoding.CheckOnClick = true;
+            clbHeaderEncoding.FormattingEnabled = true;
+            clbHeaderEncoding.IntegralHeight = false;
+            clbHeaderEncoding.Location = new Point(171, 155);
+            clbHeaderEncoding.Name = "clbHeaderEncoding";
+            clbHeaderEncoding.Size = new Size(162, 98);
+            clbHeaderEncoding.TabIndex = 7;
+            clbHeaderEncoding.ItemCheck += MessageFormat_ItemCheck;
+            // 
+            // lblGeneratedTestEmails
+            // 
+            lblGeneratedTestEmails.AutoSize = true;
+            lblGeneratedTestEmails.Font = new Font("Segoe UI", 9F, FontStyle.Bold);
+            lblGeneratedTestEmails.Location = new Point(12, 285);
+            lblGeneratedTestEmails.Name = "lblGeneratedTestEmails";
+            lblGeneratedTestEmails.Size = new Size(174, 20);
+            lblGeneratedTestEmails.TabIndex = 1;
+            lblGeneratedTestEmails.Text = "Generated Test Emails: 1";
             // 
             // Form1
             // 
             AutoScaleDimensions = new SizeF(8F, 20F);
             AutoScaleMode = AutoScaleMode.Font;
-            ClientSize = new Size(800, 511);
+            ClientSize = new Size(1000, 511);
+            Controls.Add(groupMessageFormat);
             Controls.Add(txtBCC);
             Controls.Add(txtCC);
             Controls.Add(txtSubject);
@@ -345,6 +484,10 @@
             Text = "Universal SMTP Tester";
             boxProtocol.ResumeLayout(false);
             boxProtocol.PerformLayout();
+            groupMessageFormat.ResumeLayout(false);
+            groupMessageFormat.PerformLayout();
+            tableMessageFormat.ResumeLayout(false);
+            tableMessageFormat.PerformLayout();
             ResumeLayout(false);
             PerformLayout();
         }
@@ -379,5 +522,16 @@
         private TextBox txtSubject;
         private TextBox txtCC;
         private TextBox txtBCC;
+        private GroupBox groupMessageFormat;
+        private TableLayoutPanel tableMessageFormat;
+        private Label lblTransferEncoding;
+        private CheckedListBox clbTransferEncoding;
+        private Label lblMimeBodyEncoding;
+        private CheckedListBox clbMimeBodyEncoding;
+        private Label lblCharacterEncoding;
+        private CheckedListBox clbCharacterEncoding;
+        private Label lblHeaderEncoding;
+        private CheckedListBox clbHeaderEncoding;
+        private Label lblGeneratedTestEmails;
     }
 }
