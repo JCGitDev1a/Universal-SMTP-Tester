@@ -157,5 +157,7 @@ namespace Universal_SMTP_Tester
         {
             return Math.Max(1, checkedListBox.CheckedItems.Count);
         }
+
+
     }
 }

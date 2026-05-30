@@ -77,7 +77,7 @@
             txtSmtpHost.Location = new Point(113, 152);
             txtSmtpHost.Name = "txtSmtpHost";
             txtSmtpHost.Size = new Size(123, 27);
-            txtSmtpHost.TabIndex = 0;
+            txtSmtpHost.TabIndex = 5;
             txtSmtpHost.Text = "SMTP Host";
             // 
             // intSmtpPort
@@ -85,15 +85,15 @@
             intSmtpPort.Location = new Point(515, 112);
             intSmtpPort.Name = "intSmtpPort";
             intSmtpPort.Size = new Size(53, 27);
-            intSmtpPort.TabIndex = 1;
+            intSmtpPort.TabIndex = 3;
             intSmtpPort.Text = "25";
             // 
             // sendEmail
             // 
-            sendEmail.Location = new Point(564, 302);
+            sendEmail.Location = new Point(557, 498);
             sendEmail.Name = "sendEmail";
             sendEmail.Size = new Size(87, 28);
-            sendEmail.TabIndex = 2;
+            sendEmail.TabIndex = 15;
             sendEmail.Text = "Send Email";
             sendEmail.UseVisualStyleBackColor = true;
             sendEmail.Click += sendEmail_Click;
@@ -103,14 +103,14 @@
             txtFriendlyName.Location = new Point(133, 14);
             txtFriendlyName.Name = "txtFriendlyName";
             txtFriendlyName.Size = new Size(125, 27);
-            txtFriendlyName.TabIndex = 3;
+            txtFriendlyName.TabIndex = 0;
             // 
             // txtFrom
             // 
             txtFrom.Location = new Point(417, 14);
             txtFrom.Name = "txtFrom";
             txtFrom.Size = new Size(125, 27);
-            txtFrom.TabIndex = 4;
+            txtFrom.TabIndex = 1;
             // 
             // lblFriendlyName
             // 
@@ -118,7 +118,7 @@
             lblFriendlyName.Location = new Point(12, 17);
             lblFriendlyName.Name = "lblFriendlyName";
             lblFriendlyName.Size = new Size(105, 20);
-            lblFriendlyName.TabIndex = 5;
+            //lblFriendlyName.TabIndex = 5;
             lblFriendlyName.Text = "Friendly Name";
             // 
             // lblEmailAddress
@@ -127,7 +127,7 @@
             lblEmailAddress.Location = new Point(308, 17);
             lblEmailAddress.Name = "lblEmailAddress";
             lblEmailAddress.Size = new Size(103, 20);
-            lblEmailAddress.TabIndex = 6;
+            //lblEmailAddress.TabIndex = 6;
             lblEmailAddress.Text = "Email Address";
             // 
             // lblHost
@@ -136,7 +136,7 @@
             lblHost.Location = new Point(21, 156);
             lblHost.Name = "lblHost";
             lblHost.Size = new Size(40, 20);
-            lblHost.TabIndex = 7;
+            //lblHost.TabIndex = 7;
             lblHost.Text = "Host";
             // 
             // lblPort
@@ -145,7 +145,7 @@
             lblPort.Location = new Point(453, 115);
             lblPort.Name = "lblPort";
             lblPort.Size = new Size(35, 20);
-            lblPort.TabIndex = 8;
+            //lblPort.TabIndex = 8;
             lblPort.Text = "Port";
             // 
             // boxProtocol
@@ -156,7 +156,7 @@
             boxProtocol.Location = new Point(32, 91);
             boxProtocol.Name = "boxProtocol";
             boxProtocol.Size = new Size(393, 48);
-            boxProtocol.TabIndex = 9;
+            boxProtocol.TabIndex = 2;
             boxProtocol.TabStop = false;
             boxProtocol.Text = "Protocol";
             // 
@@ -200,10 +200,10 @@
             // chkSMTPAUTH
             // 
             chkSMTPAUTH.AutoSize = true;
-            chkSMTPAUTH.Location = new Point(394, 159);
+            chkSMTPAUTH.Location = new Point(392, 155);
             chkSMTPAUTH.Name = "chkSMTPAUTH";
             chkSMTPAUTH.Size = new Size(110, 24);
-            chkSMTPAUTH.TabIndex = 10;
+            chkSMTPAUTH.TabIndex = 6;
             chkSMTPAUTH.Text = "SMTP Auth?";
             chkSMTPAUTH.UseVisualStyleBackColor = true;
             chkSMTPAUTH.CheckedChanged += chkSMTPAUTH_CheckedChanged;
@@ -213,8 +213,8 @@
             chkIgnoreSslCertificateErrors.AutoSize = true;
             chkIgnoreSslCertificateErrors.Location = new Point(592, 115);
             chkIgnoreSslCertificateErrors.Name = "chkIgnoreSslCertificateErrors";
-            chkIgnoreSslCertificateErrors.Size = new Size(179, 24);
-            chkIgnoreSslCertificateErrors.TabIndex = 11;
+            chkIgnoreSslCertificateErrors.Size = new Size(172, 24);
+            chkIgnoreSslCertificateErrors.TabIndex = 4;
             chkIgnoreSslCertificateErrors.Text = "Ignore SSL cert errors";
             chkIgnoreSslCertificateErrors.UseVisualStyleBackColor = true;
             // 
@@ -224,7 +224,7 @@
             txtUsername.Location = new Point(113, 186);
             txtUsername.Name = "txtUsername";
             txtUsername.Size = new Size(125, 27);
-            txtUsername.TabIndex = 12;
+            txtUsername.TabIndex = 7;
             // 
             // lblUsername
             // 
@@ -232,7 +232,7 @@
             lblUsername.Location = new Point(21, 193);
             lblUsername.Name = "lblUsername";
             lblUsername.Size = new Size(75, 20);
-            lblUsername.TabIndex = 13;
+            //lblUsername.TabIndex = 13;
             lblUsername.Text = "Username";
             // 
             // lblPassword
@@ -241,7 +241,7 @@
             lblPassword.Location = new Point(289, 189);
             lblPassword.Name = "lblPassword";
             lblPassword.Size = new Size(70, 20);
-            lblPassword.TabIndex = 14;
+            //lblPassword.TabIndex = 14;
             lblPassword.Text = "Password";
             // 
             // txtPassword
@@ -250,14 +250,14 @@
             txtPassword.Location = new Point(379, 182);
             txtPassword.Name = "txtPassword";
             txtPassword.Size = new Size(125, 27);
-            txtPassword.TabIndex = 15;
+            txtPassword.TabIndex = 8;
             // 
             // txtBody
             // 
             txtBody.Location = new Point(32, 315);
             txtBody.Name = "txtBody";
             txtBody.Size = new Size(470, 146);
-            txtBody.TabIndex = 16;
+            txtBody.TabIndex = 14;
             txtBody.Text = "";
             // 
             // lblTo
@@ -266,7 +266,7 @@
             lblTo.Location = new Point(14, 226);
             lblTo.Name = "lblTo";
             lblTo.Size = new Size(25, 20);
-            lblTo.TabIndex = 17;
+            //lblTo.TabIndex = 17;
             lblTo.Text = "To";
             // 
             // lblSubject
@@ -275,7 +275,7 @@
             lblSubject.Location = new Point(19, 260);
             lblSubject.Name = "lblSubject";
             lblSubject.Size = new Size(58, 20);
-            lblSubject.TabIndex = 18;
+            //lblSubject.TabIndex = 18;
             lblSubject.Text = "Subject";
             // 
             // lblCC
@@ -284,7 +284,7 @@
             lblCC.Location = new Point(317, 226);
             lblCC.Name = "lblCC";
             lblCC.Size = new Size(27, 20);
-            lblCC.TabIndex = 19;
+            //lblCC.TabIndex = 19;
             lblCC.Text = "CC";
             // 
             // lblBCC
@@ -293,7 +293,7 @@
             lblBCC.Location = new Point(315, 261);
             lblBCC.Name = "lblBCC";
             lblBCC.Size = new Size(36, 20);
-            lblBCC.TabIndex = 20;
+            //lblBCC.TabIndex = 20;
             lblBCC.Text = "BCC";
             // 
             // txtTo
@@ -301,38 +301,37 @@
             txtTo.Location = new Point(51, 222);
             txtTo.Name = "txtTo";
             txtTo.Size = new Size(151, 27);
-            txtTo.TabIndex = 21;
+            txtTo.TabIndex = 9;
             // 
             // txtSubject
             // 
             txtSubject.Location = new Point(83, 257);
             txtSubject.Name = "txtSubject";
             txtSubject.Size = new Size(213, 27);
-            txtSubject.TabIndex = 22;
+            txtSubject.TabIndex = 10;
             // 
             // txtCC
             // 
             txtCC.Location = new Point(362, 224);
             txtCC.Name = "txtCC";
             txtCC.Size = new Size(220, 27);
-            txtCC.TabIndex = 23;
+            txtCC.TabIndex = 11;
             // 
             // txtBCC
             // 
             txtBCC.Location = new Point(360, 260);
             txtBCC.Name = "txtBCC";
             txtBCC.Size = new Size(226, 27);
-            txtBCC.TabIndex = 24;
-
+            txtBCC.TabIndex = 12;
             // 
             // groupMessageFormat
             // 
             groupMessageFormat.Controls.Add(tableMessageFormat);
             groupMessageFormat.Controls.Add(lblGeneratedTestEmails);
-            groupMessageFormat.Location = new Point(620, 152);
+            groupMessageFormat.Location = new Point(633, 156);
             groupMessageFormat.Name = "groupMessageFormat";
             groupMessageFormat.Size = new Size(360, 309);
-            groupMessageFormat.TabIndex = 25;
+            groupMessageFormat.TabIndex = 13;
             groupMessageFormat.TabStop = false;
             groupMessageFormat.Text = "Message Format";
             // 
@@ -364,7 +363,7 @@
             lblTransferEncoding.AutoSize = true;
             lblTransferEncoding.Location = new Point(3, 0);
             lblTransferEncoding.Name = "lblTransferEncoding";
-            lblTransferEncoding.Size = new Size(126, 20);
+            lblTransferEncoding.Size = new Size(127, 20);
             lblTransferEncoding.TabIndex = 0;
             lblTransferEncoding.Text = "Transfer Encoding";
             // 
@@ -384,7 +383,7 @@
             lblMimeBodyEncoding.AutoSize = true;
             lblMimeBodyEncoding.Location = new Point(171, 0);
             lblMimeBodyEncoding.Name = "lblMimeBodyEncoding";
-            lblMimeBodyEncoding.Size = new Size(149, 20);
+            lblMimeBodyEncoding.Size = new Size(151, 20);
             lblMimeBodyEncoding.TabIndex = 2;
             lblMimeBodyEncoding.Text = "MIME Body Encoding";
             // 
@@ -404,7 +403,7 @@
             lblCharacterEncoding.AutoSize = true;
             lblCharacterEncoding.Location = new Point(3, 128);
             lblCharacterEncoding.Name = "lblCharacterEncoding";
-            lblCharacterEncoding.Size = new Size(141, 20);
+            lblCharacterEncoding.Size = new Size(138, 20);
             lblCharacterEncoding.TabIndex = 4;
             lblCharacterEncoding.Text = "Character Encoding";
             // 
@@ -424,7 +423,7 @@
             lblHeaderEncoding.AutoSize = true;
             lblHeaderEncoding.Location = new Point(171, 128);
             lblHeaderEncoding.Name = "lblHeaderEncoding";
-            lblHeaderEncoding.Size = new Size(125, 20);
+            lblHeaderEncoding.Size = new Size(124, 20);
             lblHeaderEncoding.TabIndex = 6;
             lblHeaderEncoding.Text = "Header Encoding";
             // 
@@ -445,15 +444,15 @@
             lblGeneratedTestEmails.Font = new Font("Segoe UI", 9F, FontStyle.Bold);
             lblGeneratedTestEmails.Location = new Point(12, 285);
             lblGeneratedTestEmails.Name = "lblGeneratedTestEmails";
-            lblGeneratedTestEmails.Size = new Size(174, 20);
+            lblGeneratedTestEmails.Size = new Size(178, 20);
             lblGeneratedTestEmails.TabIndex = 1;
-            lblGeneratedTestEmails.Text = "Generated Test Emails: 1";
+            lblGeneratedTestEmails.Text = "Estimated Test Emails: 1";
             // 
             // Form1
             // 
             AutoScaleDimensions = new SizeF(8F, 20F);
             AutoScaleMode = AutoScaleMode.Font;
-            ClientSize = new Size(1000, 511);
+            ClientSize = new Size(1143, 538);
             Controls.Add(groupMessageFormat);
             Controls.Add(txtBCC);
             Controls.Add(txtCC);
