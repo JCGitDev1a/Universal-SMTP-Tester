@@ -67,6 +67,7 @@
             lblHeaderEncoding = new Label();
             clbHeaderEncoding = new CheckedListBox();
             lblGeneratedTestEmails = new Label();
+            btnPreviewCombinations = new Button();
             boxProtocol.SuspendLayout();
             groupMessageFormat.SuspendLayout();
             tableMessageFormat.SuspendLayout();
@@ -328,6 +329,7 @@
             // 
             groupMessageFormat.Controls.Add(tableMessageFormat);
             groupMessageFormat.Controls.Add(lblGeneratedTestEmails);
+            groupMessageFormat.Controls.Add(btnPreviewCombinations);
             groupMessageFormat.Location = new Point(633, 156);
             groupMessageFormat.Name = "groupMessageFormat";
             groupMessageFormat.Size = new Size(360, 309);
@@ -448,6 +450,16 @@
             lblGeneratedTestEmails.TabIndex = 1;
             lblGeneratedTestEmails.Text = "Estimated Test Emails: 1";
             // 
+            // btnPreviewCombinations
+            // 
+            btnPreviewCombinations.Location = new Point(204, 282);
+            btnPreviewCombinations.Name = "btnPreviewCombinations";
+            btnPreviewCombinations.Size = new Size(144, 27);
+            btnPreviewCombinations.TabIndex = 2;
+            btnPreviewCombinations.Text = "&Preview Combinations";
+            btnPreviewCombinations.UseVisualStyleBackColor = true;
+            btnPreviewCombinations.Click += btnPreviewCombinations_Click;
+            // 
             // Form1
             // 
             AutoScaleDimensions = new SizeF(8F, 20F);
@@ -532,5 +544,6 @@
         private Label lblHeaderEncoding;
         private CheckedListBox clbHeaderEncoding;
         private Label lblGeneratedTestEmails;
+        private Button btnPreviewCombinations;
     }
 }

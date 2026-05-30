@@ -159,5 +159,32 @@ namespace Universal_SMTP_Tester
         }
 
 
+
+        private void btnPreviewCombinations_Click(object sender, EventArgs e)
+        {
+            var testCases = BuildEmailTestCasesFromSelections();
+
+            using var previewForm = new PreviewCombinationsForm(testCases);
+            previewForm.ShowDialog(this);
+        }
+
+        private List<EmailTestCase> BuildEmailTestCasesFromSelections()
+        {
+            return EmailTestMatrixBuilder.Build(
+                GetCheckedItemText(clbTransferEncoding),
+                GetCheckedItemText(clbMimeBodyEncoding),
+                GetCheckedItemText(clbCharacterEncoding),
+                GetCheckedItemText(clbHeaderEncoding));
+        }
+
+        private static List<string> GetCheckedItemText(CheckedListBox checkedListBox)
+        {
+            return checkedListBox.CheckedItems
+                .Cast<object>()
+                .Select(item => item.ToString() ?? string.Empty)
+                .Where(item => !string.IsNullOrWhiteSpace(item))
+                .ToList();
+        }
+
     }
 }

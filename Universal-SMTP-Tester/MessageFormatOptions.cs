@@ -31,6 +31,6 @@ public enum CharacterEncodingOption
 
 public enum HeaderEncodingOption
 {
-    Plain,
+    None,
     QuotedPrintableUtf8
 }
