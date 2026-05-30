@@ -94,7 +94,7 @@
             sendEmail.Name = "sendEmail";
             sendEmail.Size = new Size(87, 28);
             sendEmail.TabIndex = 15;
-            sendEmail.Text = "Send Email";
+            sendEmail.Text = "&Send Email";
             sendEmail.UseVisualStyleBackColor = true;
             sendEmail.Click += sendEmail_Click;
             // 
@@ -118,7 +118,7 @@
             lblFriendlyName.Location = new Point(12, 17);
             lblFriendlyName.Name = "lblFriendlyName";
             lblFriendlyName.Size = new Size(105, 20);
-            //lblFriendlyName.TabIndex = 5;
+            lblFriendlyName.TabIndex = 23;
             lblFriendlyName.Text = "Friendly Name";
             // 
             // lblEmailAddress
@@ -127,7 +127,7 @@
             lblEmailAddress.Location = new Point(308, 17);
             lblEmailAddress.Name = "lblEmailAddress";
             lblEmailAddress.Size = new Size(103, 20);
-            //lblEmailAddress.TabIndex = 6;
+            lblEmailAddress.TabIndex = 22;
             lblEmailAddress.Text = "Email Address";
             // 
             // lblHost
@@ -136,7 +136,7 @@
             lblHost.Location = new Point(21, 156);
             lblHost.Name = "lblHost";
             lblHost.Size = new Size(40, 20);
-            //lblHost.TabIndex = 7;
+            lblHost.TabIndex = 21;
             lblHost.Text = "Host";
             // 
             // lblPort
@@ -145,7 +145,7 @@
             lblPort.Location = new Point(453, 115);
             lblPort.Name = "lblPort";
             lblPort.Size = new Size(35, 20);
-            //lblPort.TabIndex = 8;
+            lblPort.TabIndex = 20;
             lblPort.Text = "Port";
             // 
             // boxProtocol
@@ -232,7 +232,7 @@
             lblUsername.Location = new Point(21, 193);
             lblUsername.Name = "lblUsername";
             lblUsername.Size = new Size(75, 20);
-            //lblUsername.TabIndex = 13;
+            lblUsername.TabIndex = 19;
             lblUsername.Text = "Username";
             // 
             // lblPassword
@@ -241,7 +241,7 @@
             lblPassword.Location = new Point(289, 189);
             lblPassword.Name = "lblPassword";
             lblPassword.Size = new Size(70, 20);
-            //lblPassword.TabIndex = 14;
+            lblPassword.TabIndex = 18;
             lblPassword.Text = "Password";
             // 
             // txtPassword
@@ -266,7 +266,7 @@
             lblTo.Location = new Point(14, 226);
             lblTo.Name = "lblTo";
             lblTo.Size = new Size(25, 20);
-            //lblTo.TabIndex = 17;
+            lblTo.TabIndex = 17;
             lblTo.Text = "To";
             // 
             // lblSubject
@@ -275,7 +275,7 @@
             lblSubject.Location = new Point(19, 260);
             lblSubject.Name = "lblSubject";
             lblSubject.Size = new Size(58, 20);
-            //lblSubject.TabIndex = 18;
+            lblSubject.TabIndex = 16;
             lblSubject.Text = "Subject";
             // 
             // lblCC
@@ -284,7 +284,7 @@
             lblCC.Location = new Point(317, 226);
             lblCC.Name = "lblCC";
             lblCC.Size = new Size(27, 20);
-            //lblCC.TabIndex = 19;
+            lblCC.TabIndex = 15;
             lblCC.Text = "CC";
             // 
             // lblBCC
@@ -293,7 +293,7 @@
             lblBCC.Location = new Point(315, 261);
             lblBCC.Name = "lblBCC";
             lblBCC.Size = new Size(36, 20);
-            //lblBCC.TabIndex = 20;
+            lblBCC.TabIndex = 14;
             lblBCC.Text = "BCC";
             // 
             // txtTo
