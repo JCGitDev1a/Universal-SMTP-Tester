@@ -109,29 +109,30 @@ namespace Universal_SMTP_Tester
 
             var bodyPart = new TextPart(GetTextPartSubtype(options.MimeType))
             {
-                Text = options.Body ?? string.Empty
+                Text = options.Body ?? string.Empty,
+                ContentTransferEncoding = GetContentTransferEncoding(options.TransferEncodingOption)
             };
 
-            var builder = new BodyBuilder();
+            message.Headers.Add("X-SMTP-Tester-Applied-Transfer-Encoding", bodyPart.ContentTransferEncoding.ToString());
 
-            if (options.MimeType.Equals("text/html", StringComparison.OrdinalIgnoreCase))
+            if (options.AttachmentPaths.Length == 0)
             {
-                builder.HtmlBody = bodyPart.Text;
+                message.Body = bodyPart;
             }
             else
             {
-                builder.TextBody = bodyPart.Text;
-            }
+                var multipart = new Multipart("mixed") { bodyPart };
 
-            foreach (var filePath in options.AttachmentPaths)
-            {
-                if (!string.IsNullOrWhiteSpace(filePath) && File.Exists(filePath))
+                foreach (var filePath in options.AttachmentPaths)
                 {
-                    builder.Attachments.Add(filePath);
+                    if (!string.IsNullOrWhiteSpace(filePath) && File.Exists(filePath))
+                    {
+                        multipart.Add(CreateAttachmentPart(filePath));
+                    }
                 }
-            }
 
-            message.Body = builder.ToMessageBody();
+                message.Body = multipart;
+            }
 
             return message;
         }
@@ -181,6 +182,37 @@ namespace Universal_SMTP_Tester
                 SmtpSecurityMode.StartTls => SecureSocketOptions.StartTls,
                 _ => SecureSocketOptions.Auto
             };
+        }
+
+        private static ContentEncoding GetContentTransferEncoding(string transferEncodingOption)
+        {
+            if (!Enum.TryParse<MimeTransferEncodingOption>(transferEncodingOption, ignoreCase: true, out var selectedEncoding))
+            {
+                return ContentEncoding.Default;
+            }
+
+            return selectedEncoding switch
+            {
+                MimeTransferEncodingOption.Base64 => ContentEncoding.Base64,
+                MimeTransferEncodingOption.QuotedPrintable => ContentEncoding.QuotedPrintable,
+                MimeTransferEncodingOption.SevenBit => ContentEncoding.SevenBit,
+                MimeTransferEncodingOption.EightBit => ContentEncoding.EightBit,
+                MimeTransferEncodingOption.Binary => ContentEncoding.Binary,
+                _ => ContentEncoding.Default
+            };
+        }
+
+        private static MimePart CreateAttachmentPart(string filePath)
+        {
+            var attachment = new MimePart(MimeTypes.GetMimeType(filePath))
+            {
+                Content = new MimeContent(File.OpenRead(filePath)),
+                ContentDisposition = new ContentDisposition(ContentDisposition.Attachment),
+                ContentTransferEncoding = ContentEncoding.Base64,
+                FileName = Path.GetFileName(filePath)
+            };
+
+            return attachment;
         }
 
         private static string GetTextPartSubtype(string mimeType)
