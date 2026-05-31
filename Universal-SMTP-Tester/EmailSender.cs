@@ -36,6 +36,13 @@ namespace Universal_SMTP_Tester
         public Encoding SubjectEncoding { get; set; } = Encoding.UTF8;
 
         public string[] AttachmentPaths { get; set; } = Array.Empty<string>();
+
+        public int TestNumber { get; set; }
+        public int TotalTestCount { get; set; }
+        public string TransferEncodingOption { get; set; } = string.Empty;
+        public string MimeBodyEncodingOption { get; set; } = string.Empty;
+        public string CharacterEncodingOption { get; set; } = string.Empty;
+        public string HeaderEncodingOption { get; set; } = string.Empty;
     }
 
     public class EmailSender
@@ -89,6 +96,16 @@ namespace Universal_SMTP_Tester
             message.Headers.Add("X-SMTP-Tester-Body-Mime-Type", options.MimeType);
             message.Headers.Add("X-SMTP-Tester-Body-Encoding", options.BodyEncoding.WebName);
             message.Headers.Add("X-SMTP-Tester-Subject-Encoding", options.SubjectEncoding.WebName);
+
+            if (options.TestNumber > 0 && options.TotalTestCount > 0)
+            {
+                message.Headers.Add("X-SMTP-Tester-Test-Number", options.TestNumber.ToString());
+                message.Headers.Add("X-SMTP-Tester-Test-Total", options.TotalTestCount.ToString());
+                message.Headers.Add("X-SMTP-Tester-Transfer-Encoding-Option", options.TransferEncodingOption);
+                message.Headers.Add("X-SMTP-Tester-Mime-Body-Encoding-Option", options.MimeBodyEncodingOption);
+                message.Headers.Add("X-SMTP-Tester-Character-Encoding-Option", options.CharacterEncodingOption);
+                message.Headers.Add("X-SMTP-Tester-Header-Encoding-Option", options.HeaderEncodingOption);
+            }
 
             var bodyPart = new TextPart(GetTextPartSubtype(options.MimeType))
             {
