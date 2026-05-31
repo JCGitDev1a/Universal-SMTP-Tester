@@ -47,6 +47,12 @@ namespace Universal_SMTP_Tester
 
     public class EmailSender
     {
+        static EmailSender()
+        {
+            // Enables legacy/code-page encodings such as ISO-8859-15.
+            Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
+        }
+
         public static void SendEmail(EmailOptions options)
         {
             SendEmailAsync(options).GetAwaiter().GetResult();
@@ -89,12 +95,18 @@ namespace Universal_SMTP_Tester
             AddAddresses(message.Cc, options.Cc);
             AddAddresses(message.Bcc, options.Bcc);
 
+            var resolvedBodyEncoding = GetCharacterEncoding(options.CharacterEncodingOption);
+            var appliedCharacterEncoding = resolvedBodyEncoding?.WebName ?? "None";
+
+            // Subject/header encoding is intentionally not forced here yet.
+            // Header-specific encoding behavior will be handled separately when
+            // HeaderEncodingOption support is implemented.
             message.Subject = options.Subject ?? string.Empty;
 
             message.Headers.Add("X-SMTP-Tester-Security-Mode", options.SecurityMode.ToString());
             message.Headers.Add("X-SMTP-Tester-Ignore-SSL-Certificate-Errors", options.IgnoreSslCertificateErrors.ToString());
             message.Headers.Add("X-SMTP-Tester-Body-Mime-Type", options.MimeType);
-            message.Headers.Add("X-SMTP-Tester-Body-Encoding", options.BodyEncoding.WebName);
+            message.Headers.Add("X-SMTP-Tester-Body-Encoding", appliedCharacterEncoding);
             message.Headers.Add("X-SMTP-Tester-Subject-Encoding", options.SubjectEncoding.WebName);
 
             if (options.TestNumber > 0 && options.TotalTestCount > 0)
@@ -109,11 +121,25 @@ namespace Universal_SMTP_Tester
 
             var bodyPart = new TextPart(GetTextPartSubtype(options.MimeType))
             {
-                Text = options.Body ?? string.Empty,
                 ContentTransferEncoding = GetContentTransferEncoding(options.TransferEncodingOption)
             };
 
+            if (resolvedBodyEncoding is null)
+            {
+                // CharacterEncodingOption.None means do not explicitly add a charset
+                // parameter to the Content-Type header. UTF-8 bytes are still used to
+                // create the body content so the message can be constructed safely.
+                var bodyBytes = Encoding.UTF8.GetBytes(options.Body ?? string.Empty);
+                bodyPart.Content = new MimeContent(new MemoryStream(bodyBytes));
+                bodyPart.ContentType.Charset = null;
+            }
+            else
+            {
+                bodyPart.SetText(resolvedBodyEncoding, options.Body ?? string.Empty);
+            }
+
             message.Headers.Add("X-SMTP-Tester-Applied-Transfer-Encoding", bodyPart.ContentTransferEncoding.ToString());
+            message.Headers.Add("X-SMTP-Tester-Applied-Character-Encoding", appliedCharacterEncoding);
 
             if (options.AttachmentPaths.Length == 0)
             {
@@ -199,6 +225,25 @@ namespace Universal_SMTP_Tester
                 MimeTransferEncodingOption.EightBit => ContentEncoding.EightBit,
                 MimeTransferEncodingOption.Binary => ContentEncoding.Binary,
                 _ => ContentEncoding.Default
+            };
+        }
+
+        private static Encoding? GetCharacterEncoding(string characterEncodingOption)
+        {
+            if (!Enum.TryParse<CharacterEncodingOption>(characterEncodingOption, ignoreCase: true, out var selectedEncoding))
+            {
+                return null;
+            }
+
+            return selectedEncoding switch
+            {
+                CharacterEncodingOption.US_ASCII => Encoding.ASCII,
+                CharacterEncodingOption.UTF8 => new UTF8Encoding(encoderShouldEmitUTF8Identifier: false),
+                CharacterEncodingOption.UTF16 => Encoding.Unicode,
+                CharacterEncodingOption.ISO_8859_1 => Encoding.GetEncoding("iso-8859-1"),
+                CharacterEncodingOption.ISO_8859_15 => Encoding.GetEncoding("iso-8859-15"),
+                CharacterEncodingOption.None => null,
+                _ => null
             };
         }
 
