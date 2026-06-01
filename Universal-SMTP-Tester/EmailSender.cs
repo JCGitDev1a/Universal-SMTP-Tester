@@ -105,7 +105,7 @@ namespace Universal_SMTP_Tester
 
             message.Headers.Add("X-SMTP-Tester-Security-Mode", options.SecurityMode.ToString());
             message.Headers.Add("X-SMTP-Tester-Ignore-SSL-Certificate-Errors", options.IgnoreSslCertificateErrors.ToString());
-            message.Headers.Add("X-SMTP-Tester-Body-Mime-Type", options.MimeType);
+            message.Headers.Add("X-SMTP-Tester-Body-Mime-Type-Option", options.MimeBodyEncodingOption);
             message.Headers.Add("X-SMTP-Tester-Body-Encoding", appliedCharacterEncoding);
             message.Headers.Add("X-SMTP-Tester-Subject-Encoding", options.SubjectEncoding.WebName);
 
@@ -119,27 +119,11 @@ namespace Universal_SMTP_Tester
                 message.Headers.Add("X-SMTP-Tester-Header-Encoding-Option", options.HeaderEncodingOption);
             }
 
-            var bodyPart = new TextPart(GetTextPartSubtype(options.MimeType))
-            {
-                ContentTransferEncoding = GetContentTransferEncoding(options.TransferEncodingOption)
-            };
+            var bodyPart = BuildBodyPart(options, resolvedBodyEncoding);
 
-            if (resolvedBodyEncoding is null)
-            {
-                // CharacterEncodingOption.None means do not explicitly add a charset
-                // parameter to the Content-Type header. UTF-8 bytes are still used to
-                // create the body content so the message can be constructed safely.
-                var bodyBytes = Encoding.UTF8.GetBytes(options.Body ?? string.Empty);
-                bodyPart.Content = new MimeContent(new MemoryStream(bodyBytes));
-                bodyPart.ContentType.Charset = null;
-            }
-            else
-            {
-                bodyPart.SetText(resolvedBodyEncoding, options.Body ?? string.Empty);
-            }
-
-            message.Headers.Add("X-SMTP-Tester-Applied-Transfer-Encoding", bodyPart.ContentTransferEncoding.ToString());
+            message.Headers.Add("X-SMTP-Tester-Applied-Transfer-Encoding", GetAppliedTransferEncoding(options.TransferEncodingOption, bodyPart));
             message.Headers.Add("X-SMTP-Tester-Applied-Character-Encoding", appliedCharacterEncoding);
+            message.Headers.Add("X-SMTP-Tester-Applied-Body-Mime-Type", GetAppliedBodyMimeType(bodyPart));
 
             if (options.AttachmentPaths.Length == 0)
             {
@@ -161,6 +145,68 @@ namespace Universal_SMTP_Tester
             }
 
             return message;
+        }
+
+        private static MimePart BuildBodyPart(EmailOptions options, Encoding? resolvedBodyEncoding)
+        {
+            var contentTransferEncoding = GetContentTransferEncoding(options.TransferEncodingOption);
+
+            if (TryGetTextPartSubtype(options.MimeBodyEncodingOption, out var textPartSubtype))
+            {
+                var textPart = new TextPart(textPartSubtype);
+
+                if (contentTransferEncoding.HasValue)
+                {
+                    textPart.ContentTransferEncoding = contentTransferEncoding.Value;
+                }
+
+                ApplyBodyContent(textPart, options.Body, resolvedBodyEncoding);
+
+                if (!contentTransferEncoding.HasValue)
+                {
+                    textPart.Headers.Remove(HeaderId.ContentTransferEncoding);
+                }
+
+                return textPart;
+            }
+
+            // MimeBodyTypeOption.None means do not explicitly add a text/plain,
+            // text/html, or multipart Content-Type for this body. The raw body bytes
+            // are still provided so the test message can be generated.
+            var bodyPart = new MimePart();
+
+            if (contentTransferEncoding.HasValue)
+            {
+                bodyPart.ContentTransferEncoding = contentTransferEncoding.Value;
+            }
+
+            var encodingForBytes = resolvedBodyEncoding ?? new UTF8Encoding(encoderShouldEmitUTF8Identifier: false);
+            bodyPart.Content = new MimeContent(new MemoryStream(encodingForBytes.GetBytes(options.Body ?? string.Empty)));
+            bodyPart.Headers.Remove(HeaderId.ContentType);
+
+            if (!contentTransferEncoding.HasValue)
+            {
+                bodyPart.Headers.Remove(HeaderId.ContentTransferEncoding);
+            }
+
+            return bodyPart;
+        }
+
+        private static void ApplyBodyContent(TextPart textPart, string? body, Encoding? resolvedBodyEncoding)
+        {
+            if (resolvedBodyEncoding is null)
+            {
+                // CharacterEncodingOption.None means do not explicitly add a charset
+                // parameter to the Content-Type header. UTF-8 bytes are still used to
+                // create the body content so the message can be constructed safely.
+                var bodyBytes = new UTF8Encoding(encoderShouldEmitUTF8Identifier: false).GetBytes(body ?? string.Empty);
+                textPart.Content = new MimeContent(new MemoryStream(bodyBytes));
+                textPart.ContentType.Charset = null;
+            }
+            else
+            {
+                textPart.SetText(resolvedBodyEncoding, body ?? string.Empty);
+            }
         }
 
         private static void ValidateOptions(EmailOptions options)
@@ -210,11 +256,11 @@ namespace Universal_SMTP_Tester
             };
         }
 
-        private static ContentEncoding GetContentTransferEncoding(string transferEncodingOption)
+        private static ContentEncoding? GetContentTransferEncoding(string transferEncodingOption)
         {
             if (!Enum.TryParse<MimeTransferEncodingOption>(transferEncodingOption, ignoreCase: true, out var selectedEncoding))
             {
-                return ContentEncoding.Default;
+                return null;
             }
 
             return selectedEncoding switch
@@ -224,7 +270,8 @@ namespace Universal_SMTP_Tester
                 MimeTransferEncodingOption.SevenBit => ContentEncoding.SevenBit,
                 MimeTransferEncodingOption.EightBit => ContentEncoding.EightBit,
                 MimeTransferEncodingOption.Binary => ContentEncoding.Binary,
-                _ => ContentEncoding.Default
+                MimeTransferEncodingOption.None => null,
+                _ => null
             };
         }
 
@@ -260,11 +307,42 @@ namespace Universal_SMTP_Tester
             return attachment;
         }
 
-        private static string GetTextPartSubtype(string mimeType)
+        private static bool TryGetTextPartSubtype(string mimeBodyEncodingOption, out string subtype)
         {
-            return mimeType.Equals("text/html", StringComparison.OrdinalIgnoreCase)
-                ? "html"
-                : "plain";
+            subtype = string.Empty;
+
+            if (!Enum.TryParse<MimeBodyTypeOption>(mimeBodyEncodingOption, ignoreCase: true, out var selectedBodyType))
+            {
+                return false;
+            }
+
+            subtype = selectedBodyType switch
+            {
+                MimeBodyTypeOption.TextPlain => "plain",
+                MimeBodyTypeOption.TextHtml => "html",
+                _ => string.Empty
+            };
+
+            return !string.IsNullOrEmpty(subtype);
+        }
+
+
+        private static string GetAppliedTransferEncoding(string transferEncodingOption, MimePart bodyPart)
+        {
+            if (!Enum.TryParse<MimeTransferEncodingOption>(transferEncodingOption, ignoreCase: true, out var selectedEncoding) ||
+                selectedEncoding == MimeTransferEncodingOption.None)
+            {
+                return "None";
+            }
+
+            return bodyPart.ContentTransferEncoding.ToString();
+        }
+
+        private static string GetAppliedBodyMimeType(MimePart bodyPart)
+        {
+            return bodyPart.ContentType is null
+                ? "None"
+                : bodyPart.ContentType.MimeType;
         }
     }
 }
